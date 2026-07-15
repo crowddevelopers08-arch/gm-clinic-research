@@ -58,26 +58,9 @@ export async function POST(req: Request) {
 }
 
 /**
- * GET /api/leads — protected list endpoint for the dashboard.
- * Requires header `x-dashboard-key` matching DASHBOARD_PASSWORD.
+ * GET /api/leads — list endpoint for the dashboard (no auth).
  */
-export async function GET(req: Request) {
-  const password = process.env.DASHBOARD_PASSWORD;
-  if (!password) {
-    return NextResponse.json(
-      { error: "DASHBOARD_PASSWORD is not configured on the server." },
-      { status: 500 }
-    );
-  }
-
-  const provided =
-    req.headers.get("x-dashboard-key") ??
-    new URL(req.url).searchParams.get("key");
-
-  if (provided !== password) {
-    return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
-  }
-
+export async function GET() {
   try {
     const leads = await prisma.lead.findMany({
       orderBy: { createdAt: "desc" },

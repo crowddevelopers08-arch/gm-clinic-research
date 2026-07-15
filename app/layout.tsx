@@ -43,6 +43,8 @@ export default function RootLayout({
       className={`${inter.variable} ${bricolage.variable} ${mono.variable}`}
     >
       <body className="bg-[var(--bg)] text-[var(--text)] antialiased">
+        {children}
+
         {/* Meta Pixel Code */}
         <Script
           id="meta-pixel"
@@ -68,11 +70,9 @@ export default function RootLayout({
             width="1"
             style={{ display: "none" }}
             src="https://www.facebook.com/tr?id=757838743050832&ev=PageView&noscript=1"
-            alt=""
           />
         </noscript>
         {/* End Meta Pixel Code */}
-        {children}
       </body>
     </html>
   );

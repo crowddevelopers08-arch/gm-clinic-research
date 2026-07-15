@@ -15,8 +15,6 @@ type Lead = {
   data: Record<string, unknown>;
 };
 
-const KEY_STORAGE = "gm_dashboard_key";
-
 const DETAIL_LABELS: Record<string, string> = {
   stage: "Stage",
   timeline: "Start / expand timeline",
@@ -48,28 +46,17 @@ function toValue(v: unknown): string {
 }
 
 export default function DashboardPage() {
-  const [key, setKey] = useState("");
-  const [authed, setAuthed] = useState(false);
   const [leads, setLeads] = useState<Lead[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [query, setQuery] = useState("");
   const [expanded, setExpanded] = useState<string | null>(null);
 
-  const fetchLeads = useCallback(async (secret: string) => {
+  const fetchLeads = useCallback(async () => {
     setLoading(true);
     setError("");
     try {
-      const res = await fetch("/api/leads", {
-        headers: { "x-dashboard-key": secret },
-        cache: "no-store",
-      });
-      if (res.status === 401) {
-        setError("Wrong password.");
-        setAuthed(false);
-        sessionStorage.removeItem(KEY_STORAGE);
-        return;
-      }
+      const res = await fetch("/api/leads", { cache: "no-store" });
       if (!res.ok) {
         const j = await res.json().catch(() => ({}));
         setError(j.error || "Failed to load leads.");
@@ -77,8 +64,6 @@ export default function DashboardPage() {
       }
       const j = await res.json();
       setLeads(j.leads ?? []);
-      setAuthed(true);
-      sessionStorage.setItem(KEY_STORAGE, secret);
     } catch {
       setError("Network error. Is the server running?");
     } finally {
@@ -87,11 +72,7 @@ export default function DashboardPage() {
   }, []);
 
   useEffect(() => {
-    const saved = sessionStorage.getItem(KEY_STORAGE);
-    if (saved) {
-      setKey(saved);
-      fetchLeads(saved);
-    }
+    fetchLeads();
   }, [fetchLeads]);
 
   const filtered = useMemo(() => {
@@ -135,48 +116,6 @@ export default function DashboardPage() {
     URL.revokeObjectURL(url);
   }
 
-  /* ---------------- login gate ---------------- */
-  if (!authed) {
-    return (
-      <main className="grid min-h-screen place-items-center bg-[var(--bg)] px-4">
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            if (key.trim()) fetchLeads(key.trim());
-          }}
-          className="w-full max-w-[380px] rounded-[18px] border border-[var(--line)] bg-white p-7 shadow-[0_20px_50px_-24px_rgba(10,35,40,.4)]"
-        >
-          <h1 className="font-[family-name:var(--font-bricolage)] text-[1.5rem] font-extrabold text-[var(--ink)]">
-            Leads Dashboard
-          </h1>
-          <p className="mt-1 mb-5 text-[.9rem] text-[var(--muted)]">
-            Enter the dashboard password to continue.
-          </p>
-          <input
-            type="password"
-            value={key}
-            autoFocus
-            onChange={(e) => setKey(e.target.value)}
-            placeholder="Dashboard password"
-            className="w-full rounded-[11px] border-[1.5px] border-[var(--line-2)] bg-[var(--bg)] px-4 py-3 text-[15px] text-[var(--text)] focus:border-[var(--brand)] focus:bg-white focus:shadow-[0_0_0_4px_rgba(0,115,95,.16)] focus:outline-none"
-          />
-          {error && (
-            <p className="mt-3 text-[.82rem] font-medium text-[#c0392b]">
-              {error}
-            </p>
-          )}
-          <button
-            type="submit"
-            disabled={loading}
-            className="mt-5 w-full rounded-full bg-[var(--accent)] py-3 font-semibold text-white transition-colors hover:bg-[var(--accent-600)] disabled:opacity-70"
-          >
-            {loading ? "Checking…" : "Unlock"}
-          </button>
-        </form>
-      </main>
-    );
-  }
-
   /* ---------------- dashboard ---------------- */
   return (
     <main className="min-h-screen bg-[var(--bg)] px-4 py-8 sm:px-8">
@@ -199,7 +138,7 @@ export default function DashboardPage() {
               className="min-w-[200px] flex-1 rounded-full border-[1.5px] border-[var(--line-2)] bg-white px-4 py-2 text-[14px] text-[var(--text)] focus:border-[var(--brand)] focus:outline-none"
             />
             <button
-              onClick={() => fetchLeads(key)}
+              onClick={() => fetchLeads()}
               disabled={loading}
               className="rounded-full border-[1.5px] border-[var(--line-2)] bg-white px-4 py-2 text-[14px] font-semibold text-[var(--ink)] hover:border-[var(--brand)] disabled:opacity-70"
             >
@@ -210,17 +149,6 @@ export default function DashboardPage() {
               className="rounded-full bg-[var(--brand)] px-4 py-2 text-[14px] font-semibold text-white hover:bg-[var(--brand-600)]"
             >
               Export CSV
-            </button>
-            <button
-              onClick={() => {
-                sessionStorage.removeItem(KEY_STORAGE);
-                setAuthed(false);
-                setKey("");
-                setLeads([]);
-              }}
-              className="rounded-full px-3 py-2 text-[14px] font-medium text-[var(--muted)] hover:text-[var(--ink)]"
-            >
-              Log out
             </button>
           </div>
         </header>

@@ -1,17 +1,10 @@
 "use client";
 
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
+import { useRouter } from "next/navigation";
 import { CONFIG } from "./config";
 import { OPEN_FORM_EVENT } from "./OpenFormButton";
-import {
-  BTN,
-  BTN_BLOCK,
-  BTN_DARK,
-  BTN_GHOST,
-  BTN_LG,
-  BTN_PRIMARY,
-  BTN_WA,
-} from "./shared";
+import { BTN, BTN_DARK, BTN_GHOST, BTN_LG, BTN_PRIMARY } from "./shared";
 
 /* =====================================================================
    Questions sourced verbatim from the "Clinic Startup Research 2026"
@@ -364,20 +357,18 @@ function Pill({
 }
 
 export function LeadFormModal() {
+  const router = useRouter();
   const [open, setOpen] = useState(false);
   const [cur, setCur] = useState(0);
   const [answers, setAnswers] = useState<Record<string, AnswerValue>>({});
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [submitted, setSubmitted] = useState(false);
   const [sending, setSending] = useState(false);
-  const downloadRef = useRef<HTMLAnchorElement>(null);
 
   /* open / close wiring */
   useEffect(() => {
     const openHandler = () => {
       setOpen(true);
       setCur(0);
-      setSubmitted(false);
       setErrors({});
     };
     window.addEventListener(OPEN_FORM_EVENT, openHandler);
@@ -488,10 +479,10 @@ export function LeadFormModal() {
       console.warn("Survey submit failed (showing success anyway):", err);
     }
 
-    setSubmitted(true);
     setSending(false);
-    // Note: the PDF is NOT auto-downloaded. It downloads only when the user
-    // clicks the "Download BMC Starter Template" button on the success screen.
+    setOpen(false);
+    // Show the dedicated thank-you page (with the PDF + WhatsApp CTAs).
+    router.push("/thank-you");
   }
 
   if (!open) return null;
@@ -528,10 +519,9 @@ export function LeadFormModal() {
           </svg>
         </button>
 
-        {!submitted ? (
-          <>
-            {/* header + progress */}
-            <div className="px-5 pt-6 sm:px-[30px] sm:pt-[26px]">
+        <>
+          {/* header + progress */}
+          <div className="px-5 pt-6 sm:px-[30px] sm:pt-[26px]">
               <div className="font-[family-name:var(--font-mono)] text-[11.5px] uppercase tracking-[.1em] text-[var(--brand-600)]">
                 Clinic Startup Research 2026
               </div>
@@ -754,70 +744,6 @@ export function LeadFormModal() {
               )}
             </div>
           </>
-        ) : (
-          /* ===== SUCCESS ===== */
-          <div className="animate-[fade_.4s_ease] px-5 pb-8 pt-10 text-center sm:px-[30px]">
-            <div className="mx-auto mb-[22px] grid h-[78px] w-[78px] place-items-center rounded-full border-2 border-[var(--brand)] bg-[var(--brand-050)]">
-              <svg
-                width="38"
-                height="38"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2.6"
-                className="text-[var(--brand-600)]"
-              >
-                <path d="M20 6 9 17l-5-5" />
-              </svg>
-            </div>
-            <h3 className="mb-[10px] font-[family-name:var(--font-bricolage)] text-[1.7rem] font-extrabold text-[var(--ink)]">
-              Thank you! 🎉
-            </h3>
-            <p className="mx-auto mb-[26px] max-w-[42ch] text-[var(--muted)]">
-              Your responses have been recorded. Download your Clinic Business
-              Model Canvas below and join the community to get your doubts
-              cleared.
-            </p>
-            <div className="mx-auto flex max-w-[360px] flex-col gap-3">
-              <a
-                ref={downloadRef}
-                href={CONFIG.pdfUrl}
-                download
-                className={`${BTN} ${BTN_PRIMARY} ${BTN_LG} ${BTN_BLOCK}`}
-              >
-                <svg
-                  width="18"
-                  height="18"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2.2"
-                >
-                  <path d="M12 3v12m0 0 4-4m-4 4-4-4M5 21h14" />
-                </svg>
-                Download BMC Starter Template (PDF)
-              </a>
-              <a
-                href={CONFIG.whatsappUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={`${BTN} ${BTN_WA} ${BTN_LG} ${BTN_BLOCK}`}
-              >
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M12 2a10 10 0 0 0-8.6 15l-1.3 4.7 4.8-1.3A10 10 0 1 0 12 2Zm5.3 14.1c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .1-1.7-.1-.4-.1-.9-.3-1.6-.6-2.8-1.2-4.6-4-4.7-4.2-.1-.2-1.1-1.5-1.1-2.8 0-1.3.7-2 .9-2.2.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5.2.5.7 1.8.8 1.9.1.1.1.3 0 .5-.1.2-.2.3-.3.5-.2.2-.3.3-.1.6.1.2.7 1.1 1.5 1.7 1 .9 1.9 1.2 2.1 1.3.2.1.4.1.5-.1.1-.2.6-.7.8-.9.1-.2.3-.2.5-.1.2.1 1.4.7 1.6.8.2.1.4.2.4.3.1.1.1.5-.1 1Z" />
-                </svg>
-                Join the WhatsApp community
-              </a>
-            </div>
-            <button
-              type="button"
-              onClick={() => setOpen(false)}
-              className="mt-5 text-[.82rem] text-[var(--muted)] underline underline-offset-2"
-            >
-              Close
-            </button>
-          </div>
-        )}
       </div>
     </div>
   );

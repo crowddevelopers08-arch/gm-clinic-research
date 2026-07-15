@@ -9,8 +9,8 @@ datasource db {
   provider  = "postgresql"
   // Pooled connection string used by the app at runtime (Neon "-pooler" URL).
   url       = env("DATABASE_URL")
-  // Direct (non-pooled) connection used for migrations. Optional but recommended on Neon.
-  directUrl = env("DIRECT_URL")
+  // Direct (non-pooled) connection used for migrations (Neon "UNPOOLED" URL).
+  directUrl = env("DATABASE_URL_UNPOOLED")
 }
 
 /// A single lead / survey submission from the landing page popup form.
