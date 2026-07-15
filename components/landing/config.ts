@@ -5,8 +5,8 @@ export const CONFIG = {
   // 1) HeyGen intro video: paste the embed/share URL (leave "" to keep the placeholder)
   videoEmbed: "", // e.g. "https://app.heygen.com/embeds/xxxxxxxx"
 
-  // 2) The PDF template you're giving away (host it, then paste the link/path)
-  pdfUrl: "Grow-Medico-Clinic-BMC-Starter-Template.pdf",
+  // 2) The PDF template you're giving away (lives in /public)
+  pdfUrl: "/Clinic_BMC_Starter_Template_v0.1.pdf",
 
   // 3) Your WhatsApp community invite link
   whatsappUrl: "https://chat.whatsapp.com/XXXXXXXXXXXXXXX",
