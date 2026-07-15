@@ -44,12 +44,15 @@ export function HeroSection() {
           </Reveal>
 
           <Reveal delay={90}>
-            <h1 className="my-4 mt-5 font-[family-name:var(--font-bricolage)] text-[clamp(2.35rem,6vw,5rem)] font-extrabold leading-[1.05] tracking-[-.02em] text-white">
+            <h1 className="my-4 mt-5 font-[family-name:var(--font-bricolage)] text-[clamp(1.5rem,6vw,5rem)] font-extrabold leading-[1.12] tracking-[-.03em] text-white min-[360px]:text-[clamp(1.6rem,7vw,5rem)] min-[375px]:text-[clamp(1.72rem,7vw,5rem)] min-[400px]:text-[clamp(2rem,7vw,5rem)] sm:text-[clamp(2.35rem,6vw,5rem)] sm:leading-[1.05] sm:tracking-[-.02em]">
               Build your clinic on a{" "}
+              <br className="sm:hidden" />
               <span className="whitespace-nowrap bg-[linear-gradient(100deg,#5fe0c9,#4fb8ea,#5fe0c9)] bg-[length:200%_auto] bg-clip-text text-transparent motion-safe:animate-[sheen_6s_linear_infinite]">
                 real business plan
               </span>
-              , not guesswork.
+              ,{" "}
+              <br className="sm:hidden" />
+              not guesswork.
             </h1>
           </Reveal>
 
