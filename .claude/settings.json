@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ls -la \"c:\\\\Users\\\\sivas\\\\Downloads\\\\gm-personal-branding \\(2\\)\\\\gm-personal-branding/\")"
+    ]
+  }
+}

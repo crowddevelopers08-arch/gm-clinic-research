@@ -1,0 +1,111 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* =====================================================================
+   GROW MEDICO — BMC STARTER TEMPLATE — DESIGN TOKENS
+   ===================================================================== */
+:root {
+  /* ---- BRAND (sampled from the Grow Medico logo) ---- */
+  --brand: #00735f; /* logo "G" — deep emerald green */
+  --brand-600: #005a49; /* darker brand for hovers */
+  --brand-pulse: #079cd5; /* logo pulse-line blue (bright accent) */
+  --accent: #0a7cae; /* CTA blue — AA-legible shade of the pulse blue */
+  --accent-600: #086288;
+
+  /* ---- system ---- */
+  --brand-050: #e7f4f0;
+  --ink: #072b30; /* deep petrol — dark sections + headings (matches bgd.png) */
+  --ink-2: #05222a;
+  --text: #14302e;
+  --muted: #5c6f6c;
+  --bg: #f3f7f5;
+  --surface: #ffffff;
+  --line: #e0eae7;
+  --line-2: #d2e0dc;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-inter), system-ui, sans-serif;
+  color: var(--text);
+  background: var(--bg);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overflow-x: hidden;
+}
+
+@keyframes fade {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* cinematic modal entrance */
+@keyframes pop-in {
+  from {
+    opacity: 0;
+    transform: translateY(18px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* slow ken-burns drift for hero background image */
+@keyframes ken-burns {
+  from {
+    transform: scale(1) translate3d(0, 0, 0);
+  }
+  to {
+    transform: scale(1.12) translate3d(-1.5%, -1.5%, 0);
+  }
+}
+
+/* navbar drop-in on load */
+@keyframes drop-in {
+  from {
+    opacity: 0;
+    transform: translateY(-100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* gentle float loop */
+@keyframes floaty {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-7px);
+  }
+}
+
+/* animated gradient sheen for the hero highlight */
+@keyframes sheen {
+  to {
+    background-position: 200% center;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}
