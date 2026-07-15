@@ -9,12 +9,13 @@ export const CONFIG = {
   pdfUrl: "/Clinic_BMC_Starter_Template_v0.1.pdf",
 
   // 3) Your WhatsApp community invite link
-  whatsappUrl: "https://chat.whatsapp.com/XXXXXXXXXXXXXXX",
+  whatsappUrl: "https://chat.whatsapp.com/KGUE0j8JlJiIrlnF2tclCb",
 
   // 4) Where to send the collected leads. Leave "" and it will still work as a
   //    demo (shows success + download). To capture data, paste ONE of:
   //    - a Formspree / Getform endpoint, OR
   //    - your Google Apps Script web-app URL, OR
   //    - your CRM / TeleCRM webhook URL.
-  submitEndpoint: "",
+  //    Default: our own Prisma/Neon-backed API route that feeds the dashboard.
+  submitEndpoint: "/api/leads",
 };

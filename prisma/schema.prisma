@@ -1,0 +1,38 @@
+// Prisma schema for Grow Medico lead capture (Neon Postgres)
+// Docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  // Pooled connection string used by the app at runtime (Neon "-pooler" URL).
+  url       = env("DATABASE_URL")
+  // Direct (non-pooled) connection used for migrations. Optional but recommended on Neon.
+  directUrl = env("DIRECT_URL")
+}
+
+/// A single lead / survey submission from the landing page popup form.
+model Lead {
+  id String @id @default(cuid())
+
+  // Contact details (step 1)
+  name  String
+  email String
+  phone String
+
+  // A few frequently-scanned survey fields, surfaced as columns for the dashboard
+  speciality String?
+  city       String?
+  stage      String?
+
+  // The complete survey payload (all answers, including arrays) as submitted.
+  data Json
+
+  source    String?
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([email])
+}
