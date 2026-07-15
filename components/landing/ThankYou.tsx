@@ -10,7 +10,9 @@ export function ThankYou() {
   useEffect(() => {
     // Fire the Meta Pixel conversion event if the pixel is loaded.
     const w = window as unknown as { fbq?: (...args: unknown[]) => void };
-    w.fbq?.("track", "SubmitApplication");
+    if (w.fbq) {
+      w.fbq("track", "SubmitApplication");
+    }
   }, []);
 
   return (

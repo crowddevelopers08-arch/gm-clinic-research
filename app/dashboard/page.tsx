@@ -86,28 +86,62 @@ export default function DashboardPage() {
   }, [leads, query]);
 
   function exportCsv() {
-    const cols = [
-      "createdAt",
-      "name",
-      "email",
-      "phone",
-      "city",
-      "speciality",
-      "stage",
+    // Every column, in a sensible order. `text: true` forces Excel to keep the
+    // value as text (so a 10-digit phone doesn't become "7.6E+09").
+    const columns: {
+      header: string;
+      get: (l: Lead) => unknown;
+      text?: boolean;
+    }[] = [
+      { header: "Date", get: (l) => fmtDate(l.createdAt) },
+      { header: "Name", get: (l) => l.name },
+      { header: "Email", get: (l) => l.email },
+      { header: "Phone", get: (l) => l.phone, text: true },
+      { header: "City", get: (l) => l.city },
+      { header: "Speciality", get: (l) => l.speciality },
+      { header: "Years practising", get: (l) => l.data.years, text: true },
+      { header: "Stage", get: (l) => l.stage ?? l.data.stage },
+      { header: "Start / expand timeline", get: (l) => l.data.timeline },
+      { header: "Investment considered", get: (l) => l.data.investment },
+      { header: "Location status", get: (l) => l.data.location_status },
+      {
+        header: "Location confidence (1-5)",
+        get: (l) => l.data.location_confidence,
+      },
+      { header: "Biggest concerns", get: (l) => l.data.concerns },
+      { header: "Top problem", get: (l) => l.data.top_problem },
+      { header: "Mistake feared", get: (l) => l.data.mistake },
+      { header: "Missing support", get: (l) => l.data.missing_support },
+      { header: "Learning preference", get: (l) => l.data.learning_pref },
+      { header: "Paid support before", get: (l) => l.data.paid_before },
+      { header: "Would attend workshop", get: (l) => l.data.attend_workshop },
+      {
+        header: "Post-workshop support",
+        get: (l) => l.data.post_workshop_support,
+      },
+      { header: "Source", get: (l) => l.source },
     ];
+
+    const cell = (value: unknown, asText?: boolean) => {
+      let s = Array.isArray(value)
+        ? value.join("; ")
+        : value == null
+          ? ""
+          : String(value);
+      // Force Excel to treat all-digit values as text (avoids scientific notation).
+      if (asText && /^\d+$/.test(s)) return `="${s}"`;
+      // Guard against CSV/formula injection in free-text answers.
+      if (/^[=+\-@]/.test(s)) s = "'" + s;
+      return `"${s.replace(/"/g, '""')}"`;
+    };
+
+    const header = columns.map((c) => `"${c.header}"`).join(",");
     const rows = filtered.map((l) =>
-      cols
-        .map((c) => {
-          const val =
-            c === "createdAt"
-              ? new Date(l.createdAt).toISOString()
-              : (l as unknown as Record<string, unknown>)[c];
-          return `"${String(val ?? "").replace(/"/g, '""')}"`;
-        })
-        .join(",")
+      columns.map((c) => cell(c.get(l), c.text)).join(",")
     );
-    const csv = [cols.join(","), ...rows].join("\n");
-    const blob = new Blob([csv], { type: "text/csv" });
+    // Prepend a UTF-8 BOM so Excel renders special characters correctly.
+    const csv = "﻿" + [header, ...rows].join("\r\n");
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
