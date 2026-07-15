@@ -27,6 +27,7 @@ type Field =
       minLength?: number;
       maxLength?: number;
       mustIncludeDigit?: boolean;
+      format?: "email" | "tel";
     }
   | {
       type: "radio" | "checkbox";
@@ -52,6 +53,39 @@ type Field =
 type Step = { name: string; title: string; subtitle?: string; fields: Field[] };
 
 const STEPS: Step[] = [
+  {
+    name: "Your Details",
+    title: "Your details",
+    subtitle: "So we can send you the template and keep you updated.",
+    fields: [
+      {
+        type: "short",
+        name: "name",
+        label: "Full name",
+        required: true,
+        placeholder: "Dr. Your Name",
+        minLength: 2,
+        maxLength: 60,
+      },
+      {
+        type: "short",
+        name: "email",
+        label: "Email address",
+        required: true,
+        placeholder: "you@example.com",
+        format: "email",
+        maxLength: 80,
+      },
+      {
+        type: "short",
+        name: "phone",
+        label: "Phone number (WhatsApp)",
+        required: true,
+        placeholder: "10-digit mobile number",
+        format: "tel",
+      },
+    ],
+  },
   {
     name: "Doctor Profile",
     title: "Doctor Profile",
@@ -398,6 +432,10 @@ export function LeadFormModal() {
     if (!s) return ""; // optional & empty → fine
 
     if (f.type === "short" || f.type === "paragraph") {
+      if (f.format === "email" && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s))
+        return "Please enter a valid email address.";
+      if (f.format === "tel" && !/^\d{10}$/.test(s.replace(/\D/g, "")))
+        return "Please enter a valid 10-digit phone number.";
       if (f.minLength && s.length < f.minLength)
         return `Please enter at least ${f.minLength} characters.`;
       if (f.maxLength && s.length > f.maxLength)
@@ -544,7 +582,29 @@ export function LeadFormModal() {
                       {f.type === "short" && (
                         <input
                           className={`${inputClass} ${err ? errorRing : ""}`}
-                          type="text"
+                          type={
+                            f.format === "email"
+                              ? "email"
+                              : f.format === "tel"
+                                ? "tel"
+                                : "text"
+                          }
+                          inputMode={
+                            f.format === "email"
+                              ? "email"
+                              : f.format === "tel"
+                                ? "tel"
+                                : undefined
+                          }
+                          autoComplete={
+                            f.format === "email"
+                              ? "email"
+                              : f.format === "tel"
+                                ? "tel"
+                                : f.name === "name"
+                                  ? "name"
+                                  : undefined
+                          }
                           value={(answers[f.name] as string) || ""}
                           placeholder={f.placeholder}
                           maxLength={f.maxLength}
