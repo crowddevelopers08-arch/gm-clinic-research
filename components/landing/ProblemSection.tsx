@@ -34,7 +34,7 @@ export function ProblemSection() {
             <Reveal delay={120} className="mt-6 flex-1">
               <div className="h-full overflow-hidden rounded-[14px] bg-white/[.05]">
                 <img
-                  src="/doc.png"
+                  src="https://res.cloudinary.com/duq66ybkd/image/upload/v1784177235/doc_brac9y.png"
                   alt="Clinic business planning illustration"
                   className="h-full w-full object-cover"
                 />

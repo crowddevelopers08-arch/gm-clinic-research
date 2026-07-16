@@ -29,7 +29,7 @@ export function HeroSection() {
       className="relative isolate overflow-hidden pb-16 pt-8 sm:pb-20 sm:pt-10 lg:pb-[76px]"
     >
       {/* background image with slow ken-burns drift — portrait on mobile, wide on larger screens */}
-      <div className="absolute inset-0 -z-20 bg-[url(/mob.png)] bg-cover bg-center will-change-transform motion-safe:animate-[ken-burns_28s_ease-in-out_infinite_alternate] sm:bg-[url(/bgd.png)]" />
+      <div className="absolute inset-0 -z-20 bg-[url('https://res.cloudinary.com/duq66ybkd/image/upload/v1784177235/mob_hliih4.png')] bg-cover bg-center will-change-transform motion-safe:animate-[ken-burns_28s_ease-in-out_infinite_alternate] sm:bg-[url('https://res.cloudinary.com/duq66ybkd/image/upload/v1784177235/bgd_cal3kd.png')]" />
       {/* dark overlay for text legibility */}
       <div className="absolute inset-0 -z-10 bg-[linear-gradient(180deg,rgba(5,34,42,.68)_0%,rgba(5,34,42,.9)_100%)]" />
 

@@ -8,10 +8,11 @@ export function Footer() {
         <div className="flex items-center gap-[11px]">
           <span className="inline-flex items-center rounded-[12px] px-2 py-1 sm:px-[18px] sm:py-[10px]">
             <Image
-              src="/gmlogo1.png"
+              src="https://res.cloudinary.com/duq66ybkd/image/upload/v1784177234/gmlogo1_v1yo66.png"
               alt="Grow Medico"
               width={160}
               height={60}
+              unoptimized
               className="h-12 w-auto object-contain sm:h-14"
             />
           </span>

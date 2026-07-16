@@ -12,11 +12,12 @@ export function Navbar() {
           aria-label="Grow Medico home"
         >
           <Image
-            src="/navlogo.png"
+            src="https://res.cloudinary.com/duq66ybkd/image/upload/v1784177234/navlogo_ywntk5.png"
             alt="Grow Medico"
             width={160}
             height={80}
             priority
+            unoptimized
             className="h-9 w-auto object-contain sm:h-11"
           />
         </a>

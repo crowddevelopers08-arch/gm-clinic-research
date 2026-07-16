@@ -20,11 +20,12 @@ export function ThankYou() {
       <div className="w-full max-w-[560px] rounded-[22px] border border-[var(--line)] bg-white p-6 text-center shadow-[0_34px_70px_-30px_rgba(10,35,40,.4)] motion-safe:animate-[pop-in_.45s_cubic-bezier(.16,.84,.44,1)_both] sm:p-10">
         <Link href="/" aria-label="Grow Medico home" className="inline-flex">
           <Image
-            src="/navlogo.png"
+            src="https://res.cloudinary.com/duq66ybkd/image/upload/v1784177234/navlogo_ywntk5.png"
             alt="Grow Medico"
             width={160}
             height={80}
             priority
+            unoptimized
             className="mx-auto h-10 w-auto object-contain"
           />
         </Link>

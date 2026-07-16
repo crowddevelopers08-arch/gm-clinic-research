@@ -28,8 +28,11 @@ export const metadata: Metadata = {
   title: "Free Clinic Business Model Canvas — Grow Medico",
   description:
     "A free Business Model Canvas starter template built for doctors and clinic owners in Tamil Nadu. Map your entire clinic business on one page.",
-  // Favicon + apple-touch icon are provided by the file convention:
-  // app/icon.png and app/apple-icon.png (auto-injected by Next.js).
+  icons: {
+    icon: "https://res.cloudinary.com/duq66ybkd/image/upload/v1784177234/favgm_oxtaei.png",
+    apple:
+      "https://res.cloudinary.com/duq66ybkd/image/upload/v1784177234/favgm_oxtaei.png",
+  },
 };
 
 export default function RootLayout({
@@ -73,6 +76,16 @@ export default function RootLayout({
           />
         </noscript>
         {/* End Meta Pixel Code */}
+
+        {/* Add your custom tag here */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              // Your custom JavaScript code here
+              console.log('Custom script loaded');
+            `,
+          }}
+        />
       </body>
     </html>
   );
