@@ -39,7 +39,12 @@ export function HeroSection() {
         <div className="w-full max-w-6xl">
           <Reveal delay={0} y={18}>
             <Eyebrow tone="light" barClassName="hidden sm:inline-block">
-              For doctors &amp; clinic owners · Tamil Nadu
+              <span>
+                For doctors &amp; clinic owners
+                <br className="sm:hidden" />
+                <span className="hidden sm:inline"> · </span>
+                Tamil Nadu
+              </span>
             </Eyebrow>
           </Reveal>
 
