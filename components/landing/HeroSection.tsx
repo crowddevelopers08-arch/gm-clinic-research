@@ -4,7 +4,7 @@ import { Reveal } from "./Reveal";
 
 const chips = [
   {
-    label: "Built for Tamil Nadu clinics",
+    label: "Built for Tamil Nadu clinics and hospitals",
     icon: <path d="M20 6 9 17l-5-5" />,
   },
   {
@@ -58,7 +58,7 @@ export function HeroSection() {
 
           <Reveal delay={180} y={20}>
             <p className="mx-auto mb-[26px] max-w-[65ch] text-[clamp(1rem,1.6vw,1.35rem)] text-[#aec7c2]">
-              Most new clinics don&apos;t struggle for lack of medical skill —
+              Most new clinics don&apos;t struggle for lack of medical skill
               they struggle without a clear business framework. Get our free
               Business Model Canvas starter, made for clinic owners, and map
               your whole practice on one page.
