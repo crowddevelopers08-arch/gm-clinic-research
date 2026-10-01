@@ -21,5 +21,7 @@ export const CONFIG = {
 
   // 5) Template price shown on the pay button. The amount actually charged is
   //    RAZORPAY_TEMPLATE_AMOUNT on the server — keep the two in sync.
-  priceLabel: "₹1",
+  priceLabel: "₹499",
+  // Original price shown struck through next to priceLabel on the CTAs.
+  mrpLabel: "₹4,999",
 };

@@ -25,9 +25,9 @@ const mono = IBM_Plex_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Free Clinic Business Model Canvas — Grow Medico",
+  title: "Clinic Business Model Canvas — Grow Medico",
   description:
-    "A free Business Model Canvas starter template built for doctors and clinic owners in Tamil Nadu. Map your entire clinic business on one page.",
+    "A Business Model Canvas starter template built for doctors and clinic owners in Tamil Nadu. Map your entire clinic business on one page.",
   icons: {
     icon: "https://res.cloudinary.com/duq66ybkd/image/upload/v1784177234/favgm_oxtaei.png",
     apple:

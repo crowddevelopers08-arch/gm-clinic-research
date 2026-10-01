@@ -1,4 +1,5 @@
-import { BTN, BTN_LG, BTN_PRIMARY, Eyebrow, WRAP } from "./shared";
+import { BTN, BTN_LG, BTN_PRIMARY, Eyebrow, PriceTag, WRAP } from "./shared";
+import { CONFIG } from "./config";
 import { OpenFormButton } from "./OpenFormButton";
 import { Reveal } from "./Reveal";
 
@@ -64,7 +65,7 @@ export function HeroSection() {
           <Reveal delay={180} y={20}>
             <p className="mx-auto mb-[26px] max-w-[65ch] text-[clamp(1rem,1.6vw,1.35rem)] text-[#aec7c2]">
               Most new clinics don&apos;t struggle for lack of medical skill
-              they struggle without a clear business framework. Get our free
+              they struggle without a clear business framework. Get our
               Business Model Canvas starter, made for clinic owners, and map
               your whole practice on one page.
             </p>
@@ -75,7 +76,8 @@ export function HeroSection() {
               <OpenFormButton
                 className={`${BTN} ${BTN_PRIMARY} ${BTN_LG} w-full sm:w-auto`}
               >
-                Claim your free template
+                Claim your template{" "}
+                <PriceTag mrp={CONFIG.mrpLabel} price={CONFIG.priceLabel} />
               </OpenFormButton>
             </div>
           </Reveal>

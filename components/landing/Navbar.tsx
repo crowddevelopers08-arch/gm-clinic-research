@@ -1,5 +1,6 @@
 import Image from "next/image";
-import { BTN, BTN_PRIMARY } from "./shared";
+import { BTN, BTN_PRIMARY, PriceTag } from "./shared";
+import { CONFIG } from "./config";
 import { OpenFormButton } from "./OpenFormButton";
 
 export function Navbar() {
@@ -24,8 +25,11 @@ export function Navbar() {
         <OpenFormButton
           className={`${BTN} ${BTN_PRIMARY} !px-4 !py-[9px] !text-[13px] sm:!px-5 sm:!py-[11px] sm:!text-[14px]`}
         >
-          <span className="sm:hidden">Free template</span>
-          <span className="hidden sm:inline">Get the free template</span>
+          <span className="sm:hidden">Template {CONFIG.priceLabel}</span>
+          <span className="hidden sm:inline">
+            Get the template{" "}
+            <PriceTag mrp={CONFIG.mrpLabel} price={CONFIG.priceLabel} />
+          </span>
         </OpenFormButton>
       </div>
     </nav>

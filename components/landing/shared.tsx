@@ -48,3 +48,13 @@ export function Eyebrow({
     </span>
   );
 }
+
+/* ₹499, then ₹4,999 struck through — used inside the CTA buttons */
+export function PriceTag({ mrp, price }: { mrp: string; price: string }) {
+  return (
+    <span className="inline-flex items-baseline gap-[6px] whitespace-nowrap">
+      <span>{price}</span>
+      <s className="text-[.85em] font-medium opacity-70">{mrp}</s>
+    </span>
+  );
+}

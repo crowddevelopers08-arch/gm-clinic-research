@@ -844,9 +844,9 @@ export function LeadFormModal() {
                     "Processing…"
                   ) : (
                     <>
-                      <span className="sm:hidden">Pay {CONFIG.priceLabel} →</span>
+                      <span className="sm:hidden">Submit →</span>
                       <span className="hidden sm:inline">
-                        Pay {CONFIG.priceLabel} &amp; get template →
+                        Submit &amp; get template →
                       </span>
                     </>
                   )}

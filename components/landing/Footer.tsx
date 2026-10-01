@@ -1,5 +1,6 @@
 import Image from "next/image";
-import { BTN, BTN_PRIMARY } from "./shared";
+import { BTN, BTN_PRIMARY, PriceTag } from "./shared";
+import { CONFIG } from "./config";
 import { OpenFormButton } from "./OpenFormButton";
 import { Reveal } from "./Reveal";
 
@@ -21,11 +22,12 @@ export function Footer() {
               Ready to plan your clinic the right way?
             </p>
             <p className="mt-1 text-[.88rem]">
-              Download the free Business Model Canvas starter in minutes.
+              Get the Business Model Canvas starter in minutes.
             </p>
           </div>
           <OpenFormButton className={`${BTN} ${BTN_PRIMARY} w-full sm:w-auto`}>
-            Get the free template
+            Get the template{" "}
+            <PriceTag mrp={CONFIG.mrpLabel} price={CONFIG.priceLabel} />
           </OpenFormButton>
         </div>
 
@@ -108,7 +110,7 @@ export function Footer() {
         </div>
 
         <p className="mt-10 border-t border-white/[.08] pt-5 text-[.8rem] leading-[1.55] sm:text-[.82rem]">
-          This is a free business research &amp; education resource for clinic
+          This is a business research &amp; education resource for clinic
           owners. Please do not share any patient or confidential clinical
           information. © {new Date().getFullYear()} Grow Medico.
         </p>
