@@ -13,6 +13,9 @@ type Lead = {
   source: string | null;
   createdAt: string;
   data: Record<string, unknown>;
+  paymentStatus: string | null;
+  razorpayPaymentId: string | null;
+  amountPaise: number | null;
 };
 
 const DETAIL_LABELS: Record<string, string> = {
@@ -120,6 +123,12 @@ export default function DashboardPage() {
         get: (l) => l.data.post_workshop_support,
       },
       { header: "Source", get: (l) => l.source },
+      { header: "Payment status", get: (l) => l.paymentStatus ?? "unpaid" },
+      {
+        header: "Amount (INR)",
+        get: (l) => (l.amountPaise == null ? "" : (l.amountPaise / 100).toFixed(2)),
+      },
+      { header: "Razorpay payment ID", get: (l) => l.razorpayPaymentId },
     ];
 
     const cell = (value: unknown, asText?: boolean) => {
@@ -241,7 +250,10 @@ export default function DashboardPage() {
             >
               <div className="flex items-start justify-between gap-2">
                 <div>
-                  <div className="font-semibold text-[var(--ink)]">{l.name}</div>
+                  <div className="font-semibold text-[var(--ink)]">
+                    {l.name}
+                    <PaymentBadge status={l.paymentStatus} />
+                  </div>
                   <div className="text-[.85rem] text-[var(--muted)]">
                     {l.city || "—"} · {l.speciality || "—"}
                   </div>
@@ -276,6 +288,23 @@ export default function DashboardPage() {
   );
 }
 
+function PaymentBadge({ status }: { status: string | null }) {
+  const s = status ?? "unpaid";
+  const tone =
+    s === "paid"
+      ? "bg-[var(--brand-050)] text-[var(--brand-600)]"
+      : s === "failed"
+        ? "bg-[#fdf1ef] text-[#c0392b]"
+        : "bg-[var(--line)] text-[var(--muted)]";
+  return (
+    <span
+      className={`ml-2 inline-block rounded-full px-2 py-[1px] align-middle text-[.7rem] font-semibold uppercase tracking-[.04em] ${tone}`}
+    >
+      {s}
+    </span>
+  );
+}
+
 function FragmentRow({
   lead,
   open,
@@ -293,6 +322,7 @@ function FragmentRow({
         </td>
         <td className="px-4 py-3 font-semibold text-[var(--ink)]">
           {lead.name}
+          <PaymentBadge status={lead.paymentStatus} />
         </td>
         <td className="px-4 py-3">
           <a

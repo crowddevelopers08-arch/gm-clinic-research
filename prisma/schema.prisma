@@ -33,6 +33,15 @@ model Lead {
   source    String?
   createdAt DateTime @default(now())
 
+  // Razorpay — the template is unlocked after a paid checkout.
+  // paymentStatus: "pending" (order created) | "paid" | "failed"; null = no order yet.
+  paymentStatus     String?
+  razorpayOrderId   String?
+  razorpayPaymentId String?
+  amountPaise       Int?
+  paidAt            DateTime?
+
   @@index([createdAt])
   @@index([email])
+  @@index([razorpayOrderId])
 }

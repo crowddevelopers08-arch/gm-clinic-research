@@ -304,6 +304,33 @@ const STEPS: Step[] = [
 
 type AnswerValue = string | string[];
 
+/* ---- Razorpay Checkout (loaded on demand) ---- */
+type RazorpaySuccess = {
+  razorpay_order_id: string;
+  razorpay_payment_id: string;
+  razorpay_signature: string;
+};
+type RazorpayInstance = {
+  open: () => void;
+  on: (event: "payment.failed", cb: (r: { error?: { description?: string } }) => void) => void;
+};
+type RazorpayCtor = new (options: Record<string, unknown>) => RazorpayInstance;
+
+const CHECKOUT_SRC = "https://checkout.razorpay.com/v1/checkout.js";
+
+function loadCheckout(): Promise<RazorpayCtor> {
+  const w = window as unknown as { Razorpay?: RazorpayCtor };
+  if (w.Razorpay) return Promise.resolve(w.Razorpay);
+  return new Promise((resolve, reject) => {
+    const s = document.createElement("script");
+    s.src = CHECKOUT_SRC;
+    s.async = true;
+    s.onload = () => (w.Razorpay ? resolve(w.Razorpay) : reject(new Error("Razorpay not available")));
+    s.onerror = () => reject(new Error("Could not load Razorpay"));
+    document.body.appendChild(s);
+  });
+}
+
 const inputClass =
   "w-full rounded-[11px] border-[1.5px] border-[var(--line-2)] bg-[var(--bg)] px-[15px] py-[13px] text-[15px] text-[var(--text)] transition-all duration-150 placeholder:text-[#9AAAA7] focus:border-[var(--brand)] focus:bg-white focus:shadow-[0_0_0_4px_rgba(0,115,95,.16)] focus:outline-none";
 
@@ -363,6 +390,10 @@ export function LeadFormModal() {
   const [answers, setAnswers] = useState<Record<string, AnswerValue>>({});
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [sending, setSending] = useState(false);
+  const [payError, setPayError] = useState("");
+  // The lead saved for the current answers — reused if the visitor retries the
+  // payment, so a dismissed checkout doesn't create a duplicate lead.
+  const [leadId, setLeadId] = useState<string | null>(null);
 
   /* open / close wiring */
   useEffect(() => {
@@ -370,6 +401,7 @@ export function LeadFormModal() {
       setOpen(true);
       setCur(0);
       setErrors({});
+      setPayError("");
     };
     window.addEventListener(OPEN_FORM_EVENT, openHandler);
     return () => window.removeEventListener(OPEN_FORM_EVENT, openHandler);
@@ -391,6 +423,7 @@ export function LeadFormModal() {
   const setAnswer = (name: string, value: AnswerValue) => {
     setAnswers((prev) => ({ ...prev, [name]: value }));
     setErrors((prev) => ({ ...prev, [name]: "" }));
+    setLeadId(null);
   };
 
   const toggleCheckbox = (name: string, value: string, max?: number) => {
@@ -402,6 +435,7 @@ export function LeadFormModal() {
       return { ...prev, [name]: list };
     });
     setErrors((prev) => ({ ...prev, [name]: "" }));
+    setLeadId(null);
   };
 
   /** Returns an error message for a field, or "" when it's valid. */
@@ -454,35 +488,102 @@ export function LeadFormModal() {
   };
   const back = () => setCur((c) => Math.max(c - 1, 0));
 
-  async function handleSubmit() {
-    if (!validateStep(cur)) return;
-    setSending(true);
+  /** Saves the survey (once per set of answers) and returns the lead id. */
+  async function saveLead(): Promise<string> {
+    if (leadId) return leadId;
 
     const payload: Record<string, unknown> = {
       ...answers,
       submitted_at: new Date().toISOString(),
       source: "Clinic Startup Research 2026 — Landing Popup",
     };
+    const res = await fetch(CONFIG.submitEndpoint, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+    const j = await res.json().catch(() => ({}));
+    if (!res.ok || !j.id) throw new Error(j.error || "Could not save your answers. Please try again.");
+    setLeadId(j.id);
+    return j.id as string;
+  }
 
-    try {
-      if (CONFIG.submitEndpoint) {
-        await fetch(CONFIG.submitEndpoint, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-        });
-      }
-      // eslint-disable-next-line no-console
-      console.log("Survey captured:", payload);
-    } catch (err) {
-      // eslint-disable-next-line no-console
-      console.warn("Survey submit failed (showing success anyway):", err);
-    }
-
+  function finish() {
     setSending(false);
     setOpen(false);
     // Show the dedicated thank-you page (with the PDF + WhatsApp CTAs).
     router.push("/thank-you");
+  }
+
+  async function handleSubmit() {
+    if (!validateStep(cur)) return;
+    setSending(true);
+    setPayError("");
+
+    try {
+      const id = await saveLead();
+
+      const orderRes = await fetch("/api/razorpay/create-order", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ leadId: id }),
+      });
+      const order = await orderRes.json().catch(() => ({}));
+      if (!orderRes.ok) throw new Error(order.error || "Could not start the payment.");
+      if (order.alreadyPaid) return finish();
+
+      const Razorpay = await loadCheckout();
+      const rzp = new Razorpay({
+        key: order.keyId,
+        order_id: order.orderId,
+        amount: order.amount,
+        currency: order.currency,
+        name: "Grow Medico",
+        description: "Clinic BMC Starter Template",
+        prefill: order.prefill,
+        notes: { leadId: id },
+        theme: { color: "#00735F" },
+        handler: async (resp: RazorpaySuccess) => {
+          try {
+            const vRes = await fetch("/api/razorpay/verify", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(resp),
+            });
+            const v = await vRes.json().catch(() => ({}));
+            if (!vRes.ok || !v.verified) {
+              throw new Error(v.error || "We could not verify this payment.");
+            }
+            const w = window as unknown as { fbq?: (...args: unknown[]) => void };
+            w.fbq?.(
+              "track",
+              "Purchase",
+              { value: order.amount / 100, currency: order.currency },
+              { eventID: `purchase_${resp.razorpay_payment_id}` }
+            );
+            finish();
+          } catch (err) {
+            setSending(false);
+            setPayError(
+              `${err instanceof Error ? err.message : "Verification failed."} If money was debited, contact us with payment ID ${resp.razorpay_payment_id}.`
+            );
+          }
+        },
+        modal: {
+          ondismiss: () => {
+            setSending(false);
+            setPayError("Payment was cancelled. You can try again whenever you're ready.");
+          },
+        },
+      });
+      rzp.on("payment.failed", (r) => {
+        setPayError(r.error?.description || "Payment failed. Please try again.");
+      });
+      rzp.open();
+    } catch (err) {
+      setSending(false);
+      setPayError(err instanceof Error ? err.message : "Something went wrong. Please try again.");
+    }
   }
 
   if (!open) return null;
@@ -702,6 +803,15 @@ export function LeadFormModal() {
               </div>
             </div>
 
+            {payError && (
+              <div
+                role="alert"
+                className="border-t border-[var(--line)] bg-[#fdf1ef] px-5 py-3 text-[.85rem] font-medium text-[#c0392b] sm:px-[30px]"
+              >
+                {payError}
+              </div>
+            )}
+
             {/* nav */}
             <div className="flex items-center justify-between gap-3 border-t border-[var(--line)] px-5 py-4 sm:px-[30px] sm:py-5">
               {cur > 0 ? (
@@ -731,12 +841,12 @@ export function LeadFormModal() {
                   className={`${BTN} ${BTN_PRIMARY} ${BTN_LG} !px-5 disabled:opacity-70 sm:!px-[30px]`}
                 >
                   {sending ? (
-                    "Submitting…"
+                    "Processing…"
                   ) : (
                     <>
-                      <span className="sm:hidden">Submit →</span>
+                      <span className="sm:hidden">Pay {CONFIG.priceLabel} →</span>
                       <span className="hidden sm:inline">
-                        Submit &amp; get template →
+                        Pay {CONFIG.priceLabel} &amp; get template →
                       </span>
                     </>
                   )}

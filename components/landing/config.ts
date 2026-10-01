@@ -18,4 +18,8 @@ export const CONFIG = {
   //    - your CRM / TeleCRM webhook URL.
   //    Default: our own Prisma/Neon-backed API route that feeds the dashboard.
   submitEndpoint: "/api/leads",
+
+  // 5) Template price shown on the pay button. The amount actually charged is
+  //    RAZORPAY_TEMPLATE_AMOUNT on the server — keep the two in sync.
+  priceLabel: "₹1",
 };
